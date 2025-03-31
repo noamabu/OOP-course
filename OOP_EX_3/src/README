@@ -1,0 +1,147 @@
+yoavbarak, noam.aburbeh
+206733065, 208883538
+
+1. *Package: ascii_art*
+   - *Class: AsciiArtAlgorithm*
+     - Methods for converting images to ASCII.
+   - *Class: KeyboardInput*
+     - Methods for receiving input from the keyboard.
+   - *Class: Shell*
+     - Methods for command line interaction and input processing.
+
+2. *Package: ascii_output*
+   - *Interface: AsciiOutput*
+     - Method signatures for outputting ASCII art.
+   - *Class: ConsoleAsciiOutput* (Implements AsciiOutput)
+     - Methods for outputting ASCII art to the console.
+   - *Class: HtmlAsciiOutput* (Implements AsciiOutput)
+     - Methods for outputting ASCII art in HTML format.
+
+3. *Package: image*
+   - *Class: Image*
+     - Attributes and methods for image manipulation and processing.
+
+4. *Package: image_char_matching*
+   - *Class: BrightnessCalculationAndNormalization*
+     - Methods for calculating and normalizing brightness.
+   - *Class: CharacterEquals*
+     - Utility methods for character comparison.
+   - *Class: CharConverter*
+     - Methods for converting images or portions to characters.
+   - *Class: DoubleArrayOfCharacterTreeMap*
+     - A specialized data structure, likely for mapping brightness values to characters.
+   - *Class: Pair*
+     - A generic utility class for holding a pair of values.
+   - *Class: SubImgCharMatcher*
+     - Methods for matching sub-images to characters.
+   - *Class: TakeCareOnTreeMap*
+     - Utility methods related to TreeMap operations.
+
+### Relationships:
+
+- *AsciiArtAlgorithm* might use *Image* for processing.
+- *AsciiOutput* (Interface) is implemented by *ConsoleAsciiOutput* and *HtmlAsciiOutput* for different output
+formats.
+- Classes within *image_char_matching* package likely interact with each other and *Image* to perform
+ character matching based on image brightness and other criteria.
+
+
+In the BrightnessCalculationAndNormalization.java file, I utilized several Java data structures, each chosen
+for specific functionalities related to handling the calculation and normalization of brightness for
+characters in images:
+
+HashMap (allLetterAndBrightness, allLetterAndBrightnessNormal): I chose HashMaps to map characters to their
+respective brightness values. The HashMap allows for efficient O(1) average time complexity for insertions,
+deletions, and lookups. This efficiency is crucial for performance when processing a potentially large set of
+characters and their associated brightness values. The HashMap was selected for its fast access times and
+capability to handle numerous entries with minimal overhead, effectively balancing runtime efficiency with
+memory usage.
+
+ArrayList (maxBrightnessLetter, minBrightnessLetter): ArrayLists were used to store pairs of characters and
+their maximum and minimum brightness values, respectively. I opted for ArrayLists due to their dynamic array
+implementation that enables constant-time access to elements, O(1), and efficient amortized time complexity
+for adding elements, O(1) on average. This choice is apt for scenarios where the list size is dynamic, and
+fast index-based access is necessary. The memory overhead is considered reasonable given the flexibility
+provided.
+
+TreeSet (Character): we use it in the Shell, to contain the chars that can be use in the algorithm, we chose
+this because the complexity is O(log(n)) to add and remove any element without knowing the index, and iterate
+on all the tree is O(n).
+
+DoubleArrayOfCharacterTreeMap.java:
+In the DoubleArrayOfCharacterTreeMap class, I extended the TreeMap class. This specialized TreeMap maps Double
+keys to ArrayList<Character> values. I chose the TreeMap because it naturally orders its keys, in this case,
+brightness values, which allows for efficient retrieval of characters based on their brightness. The ArrayList
+associated with each key holds characters with the same brightness value, leveraging the dynamic resizing
+capabilities and efficient index-based access of ArrayLists. The combination of TreeMap and ArrayList ensures
+that characters can be quickly retrieved and manipulated based on their sorted brightness, with TreeMap
+providing O(log n) access and update times, and ArrayList offering O(1) access times for index-based queries
+and amortized O(1) time for element additions.
+
+TakeCareOnTreeMap.java:
+In the TakeCareOnTreeMap class, I manipulated the DoubleArrayOfCharacterTreeMap to organize and access
+characters based on their brightness values. The use of the DoubleArrayOfCharacterTreeMap allows me to
+efficiently find the closest brightness value and its associated characters, leveraging TreeMap's ability to
+find floor and ceiling keys in O(log n) time. This functionality is critical for matching characters with
+similar brightness in a performant manner, especially when dealing with a large number of characters. The
+choice of this structure is ideal for scenarios where precision and efficiency in handling sorted data are
+paramount.
+
+SubImgCharMatcher.java:
+In the SubImgCharMatcher class, I integrated the BrightnessCalculationAndNormalization and TakeCareOnTreeMap
+classes to match characters to sub-images based on brightness. The design emphasizes efficient data access
+and manipulation, utilizing the previously mentioned data structures to calculate, normalize, and match
+characters with appropriate brightness levels. The approach optimizes for both runtime efficiency, with
+operations like adding, removing, and finding characters based on brightness being executed in logarithmic or
+constant times, and memory efficiency, by avoiding unnecessary data duplication and leveraging the inherent
+efficiencies of the chosen data structures.
+
+These classes and their chosen data structures reflect a careful consideration of both runtime and memory
+complexities, balancing the need for efficient data processing with the practical requirements of memory
+usage. The choice of TreeMap, ArrayList, and custom data structures like DoubleArrayOfCharacterTreeMap
+facilitates efficient operations on the data, critical for the performance of the image character matching
+functionality.
+
+These data structures were carefully selected for their respective strengths in handling collections of
+data with different requirements for access, insertion, and deletion speeds, as well as the need to
+efficiently maintain pairs of related data. The HashMap is particularly vital for its ability to offer
+constant-time performance for key operations, making it ideal for the data processing tasks at hand. The
+ArrayList and Pair complement this by providing straightforward, flexible management of dynamic lists and
+complex data elements, respectively.
+
+3.
+To handle input errors and print error messages in Java, especially related to loading and processing images,
+I utilized the exception mechanism as follows:
+
+1. **Try-Catch Blocks**: I wrapped critical operations that could potentially throw exceptions, such as
+loading an image from a file system or parsing user input, within try-catch blocks. This approach allowed me
+to catch specific exceptions that could arise during these operations.
+
+2. **Catching `IOException`**: For operations involving file I/O, such as reading an image file, I
+specifically caught `IOExceptions`. This type of exception is common when dealing with file operations and
+can occur for various reasons, including the file not existing, lacking read permissions, or encountering an
+error while reading the file.
+
+3. **User-Friendly Error Messages**: Upon catching an exception, I implemented logic to print user-friendly
+error messages. This was achieved by extracting meaningful information from the exception object, such as the
+message or cause, and then printing a simplified or more understandable message to the user. This ensured that
+users were not confronted with cryptic system messages but instead received helpful guidance on what might
+have gone wrong.
+
+4. **Propagation of Exceptions**: In some cases, where it wasn't appropriate or possible to handle an
+exception directly, I chose to propagate the exception further up the call stack. This was done by declaring
+the method to throw the exception, using the `throws` keyword in the method signature. Propagating exceptions
+allowed higher-level methods or the application's entry point to handle the exception in a more contextually
+relevant manner, possibly involving different error handling strategies such as logging the error, informing
+the user through a different medium, or attempting to recover from the error condition.
+
+5. **Custom Exceptions**: For more domain-specific errors, I created custom exception classes. These custom
+exceptions extended either `Exception` or `RuntimeException` and were used to encapsulate and convey specific
+error conditions that could occur within the application's business logic or processing routines. Utilizing
+custom exceptions helped in making the error handling more granular and meaningful, facilitating better error
+resolution strategies and more informative user feedback.
+
+Through these strategies, I aimed to make the application more robust and user-friendly by effectively
+managing potential errors and ensuring that users are informed of issues in a clear and helpful manner. This
+approach to exception handling also contributed to making the codebase more maintainable and easier to debug,
+by clearly demarcating error handling logic and separating it from the main business logic.
