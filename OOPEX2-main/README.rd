@@ -56,4 +56,3 @@ This project is for educational purposes and can be freely modified and distribu
 
 ---
 Enjoy playing Bricker! 🏗️🎾
-
