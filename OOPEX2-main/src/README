@@ -1,0 +1,103 @@
+yoavbarak, noam.aburbeh
+206733065, 208883538
+
+1. Design for Disappearance of Bricks
+The design chosen for the disappearance of bricks in the game likely involves an event-driven approach where
+ a collision detection mechanism triggers the disappearance. When a ball hits a brick, a collision event is
+ detected, which then activates a specific CollisionStrategy associated with that brick. This strategy might
+ be a BasicCollisionStrategy that includes the logic for making the brick disappear (e.g., reducing its
+ visibility, removing it from the game area, and updating the game state to reflect the change).
+
+Process:
+
+Collision Detection: The game continuously checks for collisions between balls and bricks during gameplay.
+Strategy Activation: Upon detecting a collision, the game determines which CollisionStrategy to execute based
+on the type of brick or any special conditions.
+Disappearance Logic: The selected CollisionStrategy executes its logic, which includes making the brick
+disappear. This could involve setting the brick's visibility to false, removing it from the list of active
+game objects, and possibly triggering any additional effects (like score increment).
+
+Advantages: This design allows for easy extension (adding new types of bricks or effects upon collision) and
+encapsulates the disappearance logic within dedicated strategy classes, keeping the code modular and
+maintainable.
+
+Disadvantages: The main disadvantage could be the potential complexity introduced by having multiple strategy
+classes, which might make understanding the flow of the game and debugging more challenging.
+
+2. For displaying the player's life graphically and numerically, the implementation likely involves two
+separate systems working in parallel to provide a comprehensive view of the player's status:
+
+GraphicLifeCounter: This class likely contains a collection of icons (e.g., heart images) that represent the
+player's lives. It listens for events or notifications about life changes (loss or gain) and updates the
+display accordingly by adding or removing icons. This class is probably instantiated and initialized at the
+start of the game, with methods to update the display based on the current number of lives.
+
+NumericLifeCounter: Works in parallel with the GraphicLifeCounter but displays the life count numerically. It
+updates a text element on the UI, which is modified in response to the same events that affect the
+GraphicLifeCounter. The synchronization between the numeric and graphic counters ensures that both
+representations reflect the current state accurately.
+
+Both counters are updated through calls from a game manager or controller class, which monitors player status
+and triggers updates.
+
+3. Implementation of Special Behaviors
+Special behaviors, other than the double, are implemented through distinct strategy classes that define unique
+ effects upon collision.
+
+AddPaddleCollisionStrategy
+Implementation Details: On activation, this strategy dynamically adds a new ImitationPaddle instance to the
+game. This instance might have a timer or a specific number of hits after which it disappears.
+Class Separation: ImitationPaddle extends the Paddle class to reuse functionality but also allows for unique
+behaviors or properties. The strategy class itself is separate, enabling the dynamic alteration of game state
+without coupling to the game object classes.
+
+AddPuckCollisionStrategy
+Implementation Details: Similar to adding an extra paddle, this strategy adds Puck instances to the game.
+These pucks are smaller and can break bricks, inheriting the movement and collision detection logic from a
+base Ball class.
+Class Separation: Puck is a subclass of Ball, These pucks inherit from the main ball class, ensuring they
+share most behaviors but can be distinguished by their size or color. Like the main ball, they are subject to
+the game's physics and collision detection, contributing to the gameplay dynamics.
+
+DroppingObjectCollisionStrategy
+Implementation Details: Triggers the creation of droppable objects like Heart, which players can collect.
+These objects might have their physics for falling and disappearing upon contact with the paddle or reaching
+the bottom of the screen. Class Separation: Droppable objects are defined in their classes (e.g., Heart),
+encapsulating specific behaviors and properties. The strategy class handles the instantiation and integration
+of these objects into the game, separating the "what happens" from the "how it happens."
+
+4. DoubleBehaviorStrategy
+Combines multiple behaviors into a single collision event, specifically designed to allow one brick to exhibit
+ up to three different effects upon collision.
+
+Implementation:
+It extends CollisionStrategyDecorator, indicating it uses the Decorator pattern to enhance or combine
+behaviors dynamically.
+
+Holds references to three CollisionStrategy instances: first, second, and possibly third, allowing for a
+flexible combination of behaviors.
+
+The presence of a BasicCollisionStrategy reference suggests it integrates basic collision handling,
+potentially for managing the brick's deletion or other foundational behaviors.
+The strategy ensures that multiple behaviors can be executed sequentially or under specific conditions,
+without prematurely removing the brick from the game.
+
+NullCollisionStrategy -
+Acts as a no-operation (no-op) strategy, effectively overriding the default behavior that might lead to a
+brick's deletion after a collision.
+
+Implementation:
+Inherits from BasicCollisionStrategy, suggesting it provides a base or default collision handling mechanism
+but specifically tailored to prevent any action from being taken upon collision.
+This strategy could be applied to a brick after it has executed its designated behaviors (from
+DoubleBehaviorStrategy), ensuring the brick remains in play until explicitly removed.
+
+Realization of Double Behavior with Single Deletion-
+Combining Behaviors: DoubleBehaviorStrategy allows a brick to have up to three different behaviors upon
+collision, managed by combining different strategies.
+Preventing Premature Deletion: By incorporating NullCollisionStrategy, the implementation ensures that these
+behaviors can be activated without resulting in the brick's immediate removal. This strategy likely serves as
+a placeholder until all intended effects have been executed.
+Controlled Deletion: After the execution of all behaviors, the brick's deletion is managed in a controlled
+manner, ensuring that it only occurs once, likely facilitated by a transition to the BasicCollisionStrategy or
+ through explicit removal logic within the game's collision management system.
